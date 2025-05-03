@@ -1,0 +1,5 @@
+sentence-transformers==4.1.0
+faiss-cpu==1.11.0
+beautifulsoup4==4.13.4
+numpy==1.26.4
+transformers==4.51.3
