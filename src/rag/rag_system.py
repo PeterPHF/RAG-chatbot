@@ -9,15 +9,11 @@ class PerfectRAGSystem:
         self.embedder = SentenceTransformer('all-mpnet-base-v2')  # Higher quality than MiniLM
         
         # Perfect knowledge base with complete, natural statements
-        self.knowledge_base = np.array([
-            "ML_DEFINITION: Machine learning is a branch of artificial intelligence that develops systems capable of learning from data, identifying patterns, and making decisions with minimal human intervention. Key approaches include supervised learning (using labeled data), unsupervised learning (finding hidden patterns), and reinforcement learning (learning through rewards).",
-            "COGNITION_METHODS: Researchers measure human cognition through a combination of standardized psychological tests like the Wechsler Adult Intelligence Scale (WAIS) and Stanford-Binet IQ tests, along with advanced neuroimaging techniques including functional MRI (fMRI) which shows brain activity, electroencephalography (EEG) measuring electrical activity, and positron emission tomography (PET) scans that track metabolic processes.",
-            "ROBOT_CAPABILITIES: Contemporary robotics systems can execute both physical operations such as delicate assembly work and microsurgery, as well as cognitive functions including real-time decision-making and environmental interpretation, achieved through sophisticated sensor arrays combined with deep learning algorithms that enable adaptation to dynamic environments.",
-            "AI_DEFINITION: Artificial intelligence represents the comprehensive discipline of creating intelligent machines capable of performing tasks that typically require human cognition, including but not limited to machine learning (pattern recognition), natural language processing (communication understanding), computer vision (image interpretation), and robotic control systems (physical interaction)."
-        ])
+        self.knowledge_base = np.load("D:\RAG-chatbot\data\embeddings\gfg_embeddings_mpnet_2.npz")['chunks']
         
         # Create optimized FAISS index with proper normalization
-        embeddings = self.embedder.encode(self.knowledge_base)
+        embeddings = np.load("D:\RAG-chatbot\data\embeddings\gfg_embeddings_mpnet_2.npz")['embeddings']
+        embeddings = np.array(embeddings).astype('float32')
         faiss.normalize_L2(embeddings)
         self.index = faiss.IndexFlatIP(embeddings.shape[1])
         self.index.add(np.array(embeddings).astype('float32'))
@@ -33,12 +29,12 @@ class PerfectRAGSystem:
             truncation=True
         )
 
-    def retrieve(self, question, threshold=0.35):
+    def retrieve(self, question, k, threshold=0.35):
         """Precision retrieval with similarity validation"""
         emb = self.embedder.encode(question, convert_to_tensor=False)
         emb = np.array([emb]).astype('float32')
         faiss.normalize_L2(emb)
-        scores, indices = self.index.search(emb, 1)
+        scores, indices = self.index.search(emb, k)
         return self.knowledge_base[indices[0][0]] if scores[0][0] >= threshold else None
 
     def generate_answer(self, question, context):
@@ -77,9 +73,9 @@ class PerfectRAGSystem:
             core_info += "."
         return core_info[0].upper() + core_info[1:]  # Ensure proper capitalization
 
-    def query(self, question):
+    def query(self, question, k):
         """Flawless query interface"""
-        context = self.retrieve(question)
+        context = self.retrieve(question, k)
         if not context:
             return "I don't have sufficiently detailed information about that topic.", ""
         
@@ -100,7 +96,7 @@ questions = [
 
 print("=== PERFECTED RAG SYSTEM ===")
 for q in questions:
-    answer, source = rag.query(q)
+    answer, source = rag.query(q, k=3)
     print(f"\nQ: {q}\nA: {answer}\nSource: {source}")
 
 # Without RAG - just using the language model

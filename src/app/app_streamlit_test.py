@@ -38,12 +38,12 @@ class PerfectRAGSystem:
             truncation=True
         )
 
-    def retrieve(self, question, threshold=0.35):
+    def retrieve(self, question, k, threshold=0.35):
         """Precision retrieval with similarity validation"""
         emb = self.embedder.encode(question, convert_to_tensor=False)
         emb = np.array([emb]).astype('float32')
         faiss.normalize_L2(emb)
-        scores, indices = self.index.search(emb, 1)
+        scores, indices = self.index.search(emb, k)
         return self.knowledge_base[indices[0][0]] if scores[0][0] >= threshold else None
 
     def generate_answer(self, question, context):
@@ -82,9 +82,9 @@ class PerfectRAGSystem:
             core_info += "."
         return core_info[0].upper() + core_info[1:]  # Ensure proper capitalization
 
-    def query(self, question):
+    def query(self, question, k):
         """Flawless query interface"""
-        context = self.retrieve(question)
+        context = self.retrieve(question, k)
         if not context:
             return "I don't have sufficiently detailed information about that topic.", ""
         
@@ -127,7 +127,7 @@ question = st.text_input(
 if question:
     st.subheader("Answer")
     with st.spinner("Searching for the best answer..."):
-        answer, source = rag.query(question)
+        answer, source = rag.query(question, k=3)
     
     st.markdown(f"**{answer}**")
     

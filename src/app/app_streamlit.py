@@ -31,7 +31,7 @@ def handle_user_input():
         
         with st.chat_message("assistant"):
             with st.spinner("Searching knowledge base..."):
-                answer, context = st.session_state.rag.query(prompt)
+                answer, context = st.session_state.rag.query(prompt, 3)
                 st.markdown(answer)
                 with st.expander("View sources"):
                     st.write(context)
