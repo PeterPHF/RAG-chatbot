@@ -2,11 +2,11 @@ import streamlit as st
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent))
-from src.rag.rag_system import RAGSystem
+from src.rag.rag_system import PerfectRAGSystem
 
 @st.cache_resource
 def load_rag_system():
-    return RAGSystem()
+    return PerfectRAGSystem()
 
 def initialize_chat():
     if "messages" not in st.session_state:

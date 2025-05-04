@@ -1,3 +1,8 @@
+import streamlit as st
+
+# Page config must be first Streamlit command
+st.set_page_config(page_title="Perfect RAG System", page_icon="🤖")
+
 import numpy as np
 import faiss
 from sentence_transformers import SentenceTransformer
@@ -86,33 +91,58 @@ class PerfectRAGSystem:
         answer = self.generate_answer(question, context)
         return answer, context.split(":")[0]
 
-# Test the perfected system
-rag = PerfectRAGSystem()
+# Initialize the RAG system
+@st.cache_resource
+def load_rag_system():
+    return PerfectRAGSystem()
 
-questions = [
+rag = load_rag_system()
+
+# Streamlit UI
+st.title("🤖 Perfect RAG System")
+st.markdown("""
+This system demonstrates a Retrieval-Augmented Generation (RAG) approach to answering questions about AI, machine learning, robotics, and cognition.
+""")
+
+# Sidebar with example questions
+st.sidebar.header("Example Questions")
+example_questions = [
     "What is machine learning?",
-    "What is deep learning?",
     "How do researchers measure human cognition?",
     "What capabilities do modern robots have?",
     "Provide a comprehensive definition of artificial intelligence",
-    "Explain how nuclear reactors work"  # Unknown topic test
+    "What is deep learning?"  # Will show unknown topic handling
 ]
 
-print("=== PERFECTED RAG SYSTEM ===")
-for q in questions:
-    answer, source = rag.query(q)
-    print(f"\nQ: {q}\nA: {answer}\nSource: {source}")
+for q in example_questions:
+    if st.sidebar.button(q):
+        st.session_state.question = q
 
-# Without RAG - just using the language model
-# tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base", truncation_side='left')
-# model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
-# generator = pipeline(
-#     "text2text-generation",
-#     model=model,
-#     tokenizer=tokenizer,
-#     device='cpu',
-#     truncation=True
-# )
-# question = "answer the following question in detail\n question: What is deep learning?"
-# answer = generator(question, max_length=200)[0]['generated_text']
-# print("answer:", answer)
+# Main question input
+question = st.text_input(
+    "Ask a question about AI, ML, robotics, or cognition:",
+    value=st.session_state.get("question", "")
+)
+
+if question:
+    st.subheader("Answer")
+    with st.spinner("Searching for the best answer..."):
+        answer, source = rag.query(question)
+    
+    st.markdown(f"**{answer}**")
+    
+    if source:
+        st.markdown(f"*Source: {source}*")
+    else:
+        st.warning("The system couldn't find relevant information in its knowledge base for this question.")
+    
+    st.divider()
+    st.subheader("How this works")
+    st.markdown("""
+    This system uses:
+    1. **Retrieval**: Finds the most relevant information from a curated knowledge base
+    2. **Generation**: Creates a natural-sounding answer using a language model
+    3. **Quality Control**: Ensures answers are complete and well-structured
+    
+    Try asking follow-up questions or testing the system's knowledge boundaries!
+    """)
