@@ -14,7 +14,7 @@ class PerfectRAGSystem:
         # Create optimized FAISS index with proper normalization
         embeddings = np.load("D:\RAG-chatbot\data\embeddings\gfg_embeddings_mpnet_2.npz")['embeddings']
         embeddings = np.array(embeddings).astype('float32')
-        faiss.normalize_L2(embeddings)
+        faiss.normalize_L2(embeddings) #  normalize the vectors to unit length (L2 norm = 1) 
         self.index = faiss.IndexFlatIP(embeddings.shape[1])
         self.index.add(np.array(embeddings).astype('float32'))
         

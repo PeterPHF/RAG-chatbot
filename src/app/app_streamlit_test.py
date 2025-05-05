@@ -111,7 +111,7 @@ example_questions = [
     "How do researchers measure human cognition?",
     "What capabilities do modern robots have?",
     "Provide a comprehensive definition of artificial intelligence",
-    "What is deep learning?"  # Will show unknown topic handling
+    "What is nuclear bombers?"  # Will show unknown topic handling
 ]
 
 for q in example_questions:
