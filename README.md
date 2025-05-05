@@ -16,6 +16,7 @@ An end-to-end Retrieval-Augmented Generation (RAG) chatbot built with Streamlit.
 
 ## 🗂️ Project Structure
 
+```bash
 rag_chatbot/
 │
 ├── data/
@@ -59,7 +60,7 @@ rag_chatbot/
 ├── README.md                # Project overview
 └── .gitignore
 
----
+```
 
 ## 🚀 Getting Started
 
